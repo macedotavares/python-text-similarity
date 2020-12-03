@@ -1,9 +1,7 @@
-#!/usr/bin/env python
-#-*- coding: utf-8 -*-
-
 import operator, collections, os, sys, re, string, nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
+from tabulate import tabulate
 
 rootdir = "."
 target = sys.argv[1]
@@ -56,13 +54,15 @@ def jaccard_similarity(list1, list2):
 		
 raw_target = read(sys.argv[1])
 preprocessed_target = preprocess(sys.argv[1])
+table = []
 
 for root, dirs, files in os.walk(rootdir):
 	for other_file in files:
 		if md_regex.match(other_file):
-			other_file = os.path.join(root, other_file)
-			preprocessed_other = preprocess(other_file)
-			raw_other = read(other_file)
+			other_file_path = os.path.join(root, other_file)
+			preprocessed_other = preprocess(other_file_path)
+			raw_other = read(other_file_path)
+			filename = (other_file[:45] + '...') if len(other_file) > 45 else other_file
 
 			text_similarity = jaccard_similarity(preprocessed_target, preprocessed_other)
 			#print(text_similarity)
@@ -71,4 +71,7 @@ for root, dirs, files in os.walk(rootdir):
 			similarity = (0.25*text_similarity) + (0.75*keyword_similarity)
 			#print(similarity)
 			if similarity > similarity_threshold:
-				print(other_file + '\t\t\t\t\t' + str(round(similarity,3)*100)+'%')
+				row = [filename, str(round(similarity,3)*100)+'%']
+				table.append(row)
+
+print(tabulate(table, headers=['File', 'Score']))
