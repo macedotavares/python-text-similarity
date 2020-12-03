@@ -1,2 +1,2 @@
 # python-text-similarity
-My first attempt at a script that suggests similar notes.
+My first attempt at creating a script that suggests similar notes.
